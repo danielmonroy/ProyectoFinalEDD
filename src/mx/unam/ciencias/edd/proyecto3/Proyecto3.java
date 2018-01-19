@@ -15,6 +15,7 @@ public class Proyecto3 {
       System.err.println("Puedes proporcionar en la línea de comandos archivos y el nombre del directorio de salida para tus resultados, precedido de la bandera '-o'");
       return;
     }
+    Cola filess = new Cola<String>();
     boolean hayDirectorio = false;
     String directorio = "";
     Cola archivos = new Cola<String>();
@@ -30,21 +31,27 @@ public class Proyecto3 {
             directorio = args[i];
             System.out.println("Directorio '" + args[i] + "' creado");
           } catch (Exception e){
-            System.err.println(e);
+            System.err.println("Hay problemas con el directorio especificado :(");
+            System.exit(0);
           }
         }
       hayDirectorio = true;
       } else {
         archivos.mete(args[i]);
+        filess.mete(args[i]);
         System.out.println("Encontrado archivo '" + args[i] + "'");
       }
+    }
+    if (!hayDirectorio) {
+      System.err.println("No se especificó directorio de salida o no se tiene acceso!!");
+      System.exit(0);
     }
     while(!archivos.esVacia() && !directorio.equals("")){
       GeneradorHtml g = new GeneradorHtml((String) archivos.saca(), directorio);
     }
-
-
-
+    Stylesheet stl = new Stylesheet(directorio);
+    stl.generaArchivo();
+    GeneradorHtml index = new GeneradorHtml(directorio, filess);
   }
 
 }

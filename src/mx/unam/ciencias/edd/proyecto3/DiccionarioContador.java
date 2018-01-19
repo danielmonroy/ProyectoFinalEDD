@@ -245,14 +245,7 @@
               int i = mascara(llave);
         if( entradas[i] == null)
             throw new NoSuchElementException();
-        for (Entrada e : entradas[i]){
-            if( e.llave.equals(llave)){
-              entradas[i].elimina(e);
-              elementos --;
-              return;
-            }
-        }
-        throw new NoSuchElementException();
+        entradas[i] = null;
       }
 
       /**

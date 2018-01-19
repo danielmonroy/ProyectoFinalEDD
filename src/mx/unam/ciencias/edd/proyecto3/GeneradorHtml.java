@@ -13,6 +13,7 @@ public class GeneradorHtml{
   private DiccionarioContador dic;
   private File archivo;
   private String directorio;
+  private Cola<String> filess;
 
   public GeneradorHtml(String file, String dir){
     this.archivo = new File(file);
@@ -20,18 +21,49 @@ public class GeneradorHtml{
     generaArchivo();
   }
 
+  public GeneradorHtml(String dir, Cola<String> flss){
+    this.directorio = dir;
+    this.filess = flss;
+    generaIndex();
+  }
+
+  public void generaIndex(){
+    htmlHeaderIndex();
+    htmlEscribeIndex();
+    htmlClosure();
+    escribirIndex();
+  }
+
+  private void htmlEscribeIndex(){
+    String cc = "    <div>\n";
+    cc += "      <h1>Estructuras de Datos 2018-1</h1>\n";
+    cc += "      <h2>Luis Daniel López Monroy</h2>\n";
+    cc += "      <br>\n      <h4>Archivos Generados:</h4>\n";
+    while(!filess.esVacia()){
+      String sss = (String) filess.saca();
+      cc += "      <a href='" + sss + ".html' > " + directorio + "/" + sss + ".html</a><br>\n";
+    }
+    this.codigo += cc;
+  }
+
   public void generaArchivo(){
     htmlHeader();
     analizarContenido();
     contarPalabras();
-    generarGraficaPastel();
+    generarGraficasSVG();
+    generarArbolesSVG();
     htmlClosure();
     escribirArchivo();
   }
 
   private void htmlHeader(){
     this.codigo =
-  "<!DOCTYPE html> \n<html> \n  <head> \n    <title>" + archivo.getName() + "</title> \n  </head> \n  <body> \n";
+  "<!DOCTYPE html> \n<html> \n  <head> \n    <title>" + archivo.getName() + "</title> \n    <link rel='stylesheet' href='stylesheet.css'>\n  </head> \n  <body> \n   <h1>" + archivo.getName() + "</h1>\n";
+  }
+
+  private void htmlHeaderIndex(){
+    this.codigo =
+  "<!DOCTYPE html> \n<html> \n  <head> \n    <title>Index EDD 2018-1</title> \n    <link rel='stylesheet' href='stylesheet.css'>\n  </head> \n  <body> \n";
   }
 
   private void htmlClosure(){
@@ -53,8 +85,6 @@ public class GeneradorHtml{
           if (!s.equals("")) dic.agrega(s, s); // Agregamos la palabra al arreglo
         }
       }
-      System.out.println(dic.toString());
-
     } catch (Exception e){
       System.err.println(e);
     }
@@ -79,8 +109,31 @@ public class GeneradorHtml{
           // Close connection
           bw.close();
     } catch (Exception e) {
-	      e.printStackTrace();
+      System.err.println("Hay problemas con el directorio especificado :(");
+      System.exit(0);
+	      
 	    }
+  }
+
+  private void escribirIndex(){
+    try{
+      File newFile = new File(directorio + "/index.html");
+      if (newFile.createNewFile()){
+         System.out.println("Archivo html creado!");
+       }else{
+         System.out.println("Se sobreescribió el archivo index.html");
+       }
+       FileWriter fw = new FileWriter(newFile.getAbsoluteFile());
+          BufferedWriter bw = new BufferedWriter(fw);
+
+          // Write in file
+          bw.write(this.codigo);
+
+          // Close connection
+          bw.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+      }
   }
 
 
@@ -105,10 +158,21 @@ public class GeneradorHtml{
   }
 
 
-  private void generarGraficaPastel(){
-    /*
+  private void generarGraficasSVG(){
+    GeneraGrafica pie = new GeneraGrafica(dic);
+    this.codigo += "    <div>\n";
+    //this.codigo += pie.generaPieSVG();
+    this.codigo += pie.generaBarSVG();
+    this.codigo += "    </div>\n";
+  }
 
-    GraficaPastel pie = new GraficaPastel()
-    */
+  private void generarArbolesSVG(){
+    GeneraArbol tree = new GeneraArbol(dic);
+    this.codigo += "    <div>\n";
+    this.codigo += tree.generaRojinegroSVG();
+    this.codigo += "    </div>\n";
+    this.codigo += "    <div>\n";
+    this.codigo += tree.generaAVLSVG();
+    this.codigo += "    </div>\n";
   }
 }
